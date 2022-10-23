@@ -14,7 +14,10 @@ type TagInfo struct {
 }
 
 func ParseStructTag(tagType string, tagStr string) *TagInfo {
-	res := &TagInfo{}
+	res := &TagInfo{
+		Require: true,
+	}
+
 	tag := strings.TrimSpace(reflect.StructTag(tagStr).Get(tagType))
 	if tag != "" {
 		sp := strings.Split(tag, ",")
@@ -24,10 +27,18 @@ func ParseStructTag(tagType string, tagStr string) *TagInfo {
 			if item == "inline" {
 				res.Inline = true
 			}
+			if item == "omitempty" {
+				res.Require = false
+			}
 		}
 	}
+
+	require, ok := reflect.StructTag(tagStr).Lookup("require")
+	if ok {
+		res.Require = require == "true" || require == "True"
+	}
+
 	res.Default, _ = reflect.StructTag(tagStr).Lookup("default")
-	_, res.Require = reflect.StructTag(tagStr).Lookup("require")
 	enumsStr, _ := reflect.StructTag(tagStr).Lookup("enums")
 
 	if enumsStr != "" {

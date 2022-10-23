@@ -18,6 +18,7 @@ var (
 var (
 	fileName    = flag.String("f", "", "file path")
 	title       = flag.String("t", "", "file title")
+	tagType     = flag.String("tag", "json", "struct tag name")
 	showVersion = flag.Bool("v", false, "show version")
 )
 
@@ -34,10 +35,12 @@ func main() {
 	rootMod, _, _ := getModPath()
 	log.Println("Current Module:", rootMod)
 
-	parser, err := NewParser(dstModPath)
+	parser, err := NewParser(*tagType, dstModPath)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatalf("new parser %v", err)
+		return
 	}
+
 	for _, tp := range dstTypes {
 		log.Printf("start generate %s.%s\n", dstModPath, tp)
 		fs := parser.Parse(dstModPath, tp)

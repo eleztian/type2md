@@ -13,7 +13,6 @@ import (
 
 type Parser struct {
 	Tag             string
-	RootModPath     string
 	program         *loader.Program
 	loaderCfg       *loader.Config
 	fileImportNamed map[*ast.File]map[string]string
@@ -21,7 +20,7 @@ type Parser struct {
 	parsedType      map[string]struct{}
 }
 
-func NewParser(modPath string) (*Parser, error) {
+func NewParser(tagName string, modPath string) (*Parser, error) {
 	cfg := &loader.Config{
 		ParserMode: goparser.ParseComments,
 	}
@@ -32,8 +31,7 @@ func NewParser(modPath string) (*Parser, error) {
 		return nil, err
 	}
 	res := &Parser{
-		Tag:             "json",
-		RootModPath:     "",
+		Tag:             tagName,
 		program:         p,
 		loaderCfg:       cfg,
 		fileImportNamed: map[*ast.File]map[string]string{},

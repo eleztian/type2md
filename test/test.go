@@ -9,11 +9,13 @@ type Config struct {
 	Pre     ext.Hook
 	Post    *ext.Hook
 	Servers map[string]struct {
-		Host string `json:"host"`
-		Port int    `json:"port" enums:"22,65522" require:""`
+		Host string `json:"host,omitempty"`
+		Port int    `json:"port" enums:"22,65522" require:"false"`
 	} `json:"servers"` // server list
 	Test1 `json:",inline"`
 	Test  []string // sss
+	Test2 map[string]map[int]*Test1
+	Test3 [][2]string `json:"test3"`
 }
 
 type Test1 struct {
