@@ -18,6 +18,7 @@ type Parser struct {
 	loaderCfg       *loader.Config
 	fileImportNamed map[*ast.File]map[string]string
 	fileTypeDoc     map[*ast.File]map[string]string
+	parsedType      map[string]struct{}
 }
 
 func NewParser(modPath string) (*Parser, error) {
@@ -37,6 +38,7 @@ func NewParser(modPath string) (*Parser, error) {
 		loaderCfg:       cfg,
 		fileImportNamed: map[*ast.File]map[string]string{},
 		fileTypeDoc:     map[*ast.File]map[string]string{},
+		parsedType:      map[string]struct{}{},
 	}
 
 	return res, nil
@@ -92,6 +94,10 @@ func (p *Parser) parseFileStruct(
 
 	res := make(map[string]StructInfo, 0)
 	typeKey := TypeKey(modPath, objName)
+	if _, ok := p.parsedType[typeKey]; ok {
+		return res
+	}
+	p.parsedType[typeKey] = struct{}{}
 
 	namedImportMap := p.fileImportNamed[file]
 	typeDocMap := p.fileTypeDoc[file]
@@ -225,7 +231,8 @@ func (p *Parser) parseTypeExpr(obj ast.Expr) []FieldInfo {
 		res = []FieldInfo{{Type: ot.Sel.Name, Reference: ot.X.(*ast.Ident).Name, skipNum: 1}}
 	case *ast.Ident:
 		field := FieldInfo{
-			Type: ot.Name,
+			Type:    ot.Name,
+			skipNum: 1,
 		}
 		if ot.Obj != nil {
 			field.Reference = "."
@@ -266,6 +273,11 @@ func (p *Parser) parseStruct(objStructType *ast.StructType, desc string) StructI
 	}
 
 	for _, f := range objStructType.Fields.List {
+		if len(f.Names) == 0 {
+			f.Names = []*ast.Ident{
+				&ast.Ident{Name: f.Type.(fmt.Stringer).String()},
+			}
+		}
 		if f.Names[0].Name[0] <= 'Z' && f.Names[0].Name[0] >= 'A' {
 			res.Fields = append(res.Fields, p.parseStructField(f)...)
 		}
