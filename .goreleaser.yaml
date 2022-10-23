@@ -1,0 +1,45 @@
+project_name: type2md
+builds:
+  - env:
+      - CGO_ENABLED=0
+      - GOPROXY="https://goproxy.cn,direct"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X "main.Version={{ .Version }}"
+      - -X "main.CommitID={{ .ShortCommit }}"
+      - -X "main.BuildTime={{ .Date }}"
+    main: .
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  use: gitlab
+  groups:
+    - title: Features
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 100
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 200
+    - title: 'Documentation updates'
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 400
+    - title: Others
+      order: 999
+  filters:
+    exclude:
+      - '^test:'
+      - '^chore'
+      - 'merge conflict'
+      - '^ci'
+      - '^style'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+
+release:
+  footer: "Thanks for your support!"
