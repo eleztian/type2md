@@ -69,6 +69,8 @@ func main() {
 		if filename == "" {
 			filename = tp + "_doc.md"
 		}
+		_ = os.MkdirAll(filepath.Dir(filename), 0755)
+
 		log.Printf("start to save to %s\n", filename)
 		_ = os.WriteFile(filename, data, 0655)
 	}
