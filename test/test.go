@@ -16,6 +16,7 @@ type Config struct {
 	Test  []string // sss
 	Test2 map[string]map[int]*Test1
 	Test3 [][2]string `json:"test3"`
+	C     []interface{}
 }
 
 type Test1 struct {

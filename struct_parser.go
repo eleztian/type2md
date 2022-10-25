@@ -225,6 +225,14 @@ func (p *Parser) parseTypeExpr(obj ast.Expr) []FieldInfo {
 	}
 	var res []FieldInfo
 	switch ot := obj.(type) {
+	case *ast.InterfaceType:
+		if ot.Incomplete || (ot.Methods != nil && len(ot.Methods.List) == 0) {
+			field := FieldInfo{
+				Type:    "any",
+				skipNum: 1,
+			}
+			res = append(res, field)
+		}
 	case *ast.SelectorExpr:
 		res = []FieldInfo{{Type: ot.Sel.Name, Reference: ot.X.(*ast.Ident).Name, skipNum: 1}}
 	case *ast.Ident:
@@ -403,6 +411,11 @@ func (p *Parser) parseStructField(f *ast.Field) []FieldInfo {
 		baseField.Type = tt.Sel.Name
 		baseField.Reference = tt.X.(*ast.Ident).Name
 		res = append(res, baseField)
+	case *ast.InterfaceType:
+		if tt.Incomplete || (tt.Methods != nil && len(tt.Methods.List) == 0) {
+			baseField.Type = "any"
+			res = append(res, baseField)
+		}
 	}
 
 	return res

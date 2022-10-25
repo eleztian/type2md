@@ -11,6 +11,13 @@ Config doc.
 |Test.[]|string|true||sss.|
 |Test2.{string}.{int}.|[Test1](#Test1)|true|||
 |test3.[].[2]|string|true|||
+|C.[]|any|true|||
+
+## Test1
+
+| Key      | Type      | Require | Default           | Describe          |
+|----------|----------|-----|------------------|--------------|
+|a|string|true|||
 
 ## ext.Hook
 Hook hook config.
@@ -31,12 +38,6 @@ Mode mode define.
 |----------|--------------|
 |1|mode q.|
 |2|mode a.|
-
-## Test1
-
-| Key      | Type      | Require | Default           | Describe          |
-|----------|----------|-----|------------------|--------------|
-|a|string|true|||
 
 
 ---
