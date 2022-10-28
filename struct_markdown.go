@@ -22,7 +22,7 @@ func (mk *Markdown) Generate(data map[string]StructInfo) []byte {
 	tpMap := make(map[string]struct{})
 	genStruct := func(structInfo StructInfo) {
 		if len(structInfo.Describe) != 0 {
-			buf.WriteString(structInfo.Describe)
+			buf.WriteString(transMarkdownField(structInfo.Describe, true))
 			buf.WriteString("\n")
 		}
 
@@ -31,32 +31,33 @@ func (mk *Markdown) Generate(data map[string]StructInfo) []byte {
 				"|----------|----------|-----|------------------|--------------|\n")
 		for _, item := range structInfo.Fields {
 			buf.WriteString("|")
-			buf.WriteString(item.Name)
+			buf.WriteString(transMarkdownField(item.Name, false))
 			buf.WriteString("|")
 			if item.Reference != "" {
 				buf.WriteString(fmt.Sprintf("[%s](#%s)", item.Type, mk.ObjTitleFunc(item.Reference, item.Type)))
 				key := genKey(item.Reference, item.Type)
 				if _, ok := tpMap[key]; !ok {
 					types = append(types, key)
+					tpMap[key] = struct{}{}
 				}
 			} else {
-				buf.WriteString(item.Type)
+				buf.WriteString(transMarkdownField(item.Type, false))
 			}
 			buf.WriteString("|")
-			buf.WriteString(fmt.Sprintf("%v", item.Require))
+			buf.WriteString(transMarkdownField(fmt.Sprintf("%v", item.Require), false))
 			buf.WriteString("|")
-			buf.WriteString(item.Default)
+			buf.WriteString(transMarkdownField(item.Default, false))
 			buf.WriteString("|")
-			buf.WriteString(item.Describe)
+			buf.WriteString(transMarkdownField(item.Describe, false))
 			if len(item.Enums.Names) != 0 {
 				if item.Describe != "" {
 					buf.WriteString("<br>")
 				}
 				for idx, nd := range item.Enums.Names {
 					if nd[1] != "" {
-						buf.WriteString(fmt.Sprintf("- `%s`:%s<br>", nd[0], nd[1]))
+						buf.WriteString(transMarkdownField(fmt.Sprintf("- `%s`:%s<br>", nd[0], nd[1]), false))
 					} else {
-						buf.WriteString(fmt.Sprintf("- `%s`", nd[0]))
+						buf.WriteString(transMarkdownField(fmt.Sprintf("- `%s`", nd[0]), false))
 					}
 					if idx != len(item.Enums.Names)-1 {
 						buf.WriteString("<br>")
@@ -101,7 +102,6 @@ func (mk *Markdown) Generate(data map[string]StructInfo) []byte {
 			continue
 		}
 		modPath, typeName := parseKey(name)
-
 		buf.WriteString(fmt.Sprintf("\n## %s\n", mk.ObjTitleFunc(modPath, typeName)))
 		if structInfo.Enums != nil {
 			genEnums(structInfo.Enums, structInfo.Describe)
@@ -116,6 +116,65 @@ func (mk *Markdown) Generate(data map[string]StructInfo) []byte {
 		mk.MainStructName))
 
 	return buf.Bytes()
+}
+
+var markdownStringReplacer = strings.NewReplacer(
+	//"-", "&#45;",
+	"!", "&#33;",
+	"”", "&#34;",
+	"%", "&#37;",
+	"&", "&#38;",
+	"'", "&#39;",
+	"(", "&#40;",
+	")", "&#41;",
+	"*", "&#42;",
+	"+", "&#43;",
+	"<", "&#60;",
+	"=", "&#61;",
+	">", "&#62;",
+	"?", "&#63;",
+	"@", "&#64;",
+	"[", "&#91;",
+	"\\", "&#92;",
+	"]", "&#93; ",
+	"{", "&#123;",
+	"|", "&#124;",
+	"}", "&#125;",
+	"\n", "<br>",
+)
+var markdownStringReplacerNoNewLine = strings.NewReplacer(
+	"-", "&#45;",
+	"!", "&#33;",
+	"”", "&#34;",
+	"%", "&#37;",
+	"&", "&#38;",
+	"'", "&#39;",
+	"(", "&#40;",
+	")", "&#41;",
+	"*", "&#42;",
+	"+", "&#43;",
+	"<", "&#60;",
+	"=", "&#61;",
+	">", "&#62;",
+	"?", "&#63;",
+	"@", "&#64;",
+	"[", "&#91;",
+	"\\", "&#92;",
+	"]", "&#93; ",
+	"{", "&#123;",
+	"|", "&#124;",
+	"}", "&#125;",
+)
+
+func transMarkdownField(src string, allowNewline bool) string {
+	if src == "" {
+		return " "
+	}
+	if allowNewline {
+		return markdownStringReplacerNoNewLine.Replace(src)
+	} else {
+		return markdownStringReplacer.Replace(src)
+	}
 }
 
 func parseKey(name string) (string, string) {
