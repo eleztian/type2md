@@ -1,6 +1,7 @@
 package main
 
 type StructInfo struct {
+	Name     string      `json:"name"`
 	Describe string      `json:"describe"`
 	Fields   []FieldInfo `json:"fields"`
 	Enums    *EnumInfo   `json:"enums"`
