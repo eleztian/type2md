@@ -12,13 +12,23 @@ type Config struct {
 		Host string `json:"host,omitempty"`
 		Port int    `json:"port" enums:"22,65522" require:"false"`
 	} `json:"servers"` // server list
-	Test1 `json:",inline"`
-	Test  []string // sss
-	Test2 map[string]map[int]*Test1
-	Test3 [][2]string `json:"test3"`
-	C     []interface{}
+	InlineStruct `json:",inline"` // inline struct
+	Slice        []string         // sss
+	MapData      map[string]map[int]*OtherStruct
+	ArrayData    [][2]string   `json:"array_data"`
+	C            []interface{} // slice interface{}
 }
 
-type Test1 struct {
-	A string `json:"a"`
+// InlineStruct inline struct.
+type InlineStruct struct {
+	A string `json:"a"` // inline struct field a
+}
+
+// OtherStruct other struct
+// this is use for test.
+type OtherStruct struct {
+	A string                 `json:"a" require:"true" default:"default value"`
+	B [][2]ext.Mode          `json:"b"` // array string
+	C map[string]interface{} `json:"c"` // map[string]interface{}
+	D *OtherStruct           `json:"d"` // nested struct
 }
