@@ -116,10 +116,13 @@ func (p *Parser) parseFileStruct(
 
 		key := TypeKey(subModPath, field.Type)
 		if _, ok := exParseMap[key]; !ok {
+			exParseMap[key] = struct{}{}
+			if _, ok := p.parsedType[key]; ok {
+				continue
+			}
 			for typeName, fields := range p.Parse(subModPath, field.Type) {
 				res[typeName] = fields
 			}
-			exParseMap[key] = struct{}{}
 		}
 	}
 
@@ -281,7 +284,7 @@ func (p *Parser) parseStruct(objStructType *ast.StructType, desc string) StructI
 	for _, f := range objStructType.Fields.List {
 		if len(f.Names) == 0 {
 			f.Names = []*ast.Ident{
-				&ast.Ident{Name: f.Type.(fmt.Stringer).String()},
+				{Name: f.Type.(fmt.Stringer).String()},
 			}
 		}
 		if f.Names[0].Name[0] <= 'Z' && f.Names[0].Name[0] >= 'A' {

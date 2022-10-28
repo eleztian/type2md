@@ -21,6 +21,6 @@ convert it into a markdown file.
 Version  : %s
 CommitID : %s
 BuildTime: %s
-Author   : MoreSec CPF 中间件团队
+Author   : eleztian
 `, os.Args[0], Version, CommitID, BuildTime)
 }
