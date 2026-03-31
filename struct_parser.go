@@ -280,8 +280,15 @@ func (p *Parser) parseStruct(objStructType *ast.StructType, desc string) StructI
 
 	for _, f := range objStructType.Fields.List {
 		if len(f.Names) == 0 {
-			f.Names = []*ast.Ident{
-				{Name: f.Type.(fmt.Stringer).String()},
+			s, ok := f.Type.(fmt.Stringer)
+			if !ok {
+				f.Names = []*ast.Ident{
+					{Name: "unknown"},
+				}
+			} else {
+				f.Names = []*ast.Ident{
+					{Name: s.String()},
+				}
 			}
 		}
 		if f.Names[0].Name[0] <= 'Z' && f.Names[0].Name[0] >= 'A' {
