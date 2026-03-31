@@ -6,8 +6,8 @@ import "github.com/eleztian/type2md/test/ext"
 
 // Config doc.
 type Config struct {
-	Pre     ext.Hook
-	Post    *ext.Hook
+	Pre     Pre
+	Post    *ext.Post
 	Servers map[string]struct {
 		Host string `json:"host,omitempty"`
 		Port int    `json:"port" enums:"22,65522" require:"false"`
@@ -27,8 +27,8 @@ type InlineStruct struct {
 // OtherStruct other struct
 // this is use for test.
 type OtherStruct struct {
-	A string                 `json:"a" require:"true" default:"default value"`
-	B [][2]ext.Mode          `json:"b"` // array string
-	C map[string]interface{} `json:"c"` // map[string]interface{}
-	D *OtherStruct           `json:"d"` // nested struct
+	A string                 `json:"a" require:"true" default:"default value"` // +optional
+	B [][2]ext.Mode          `json:"b"`                                        // array string
+	C map[string]interface{} `json:"c"`                                        // map[string]interface{}
+	D *OtherStruct           `json:"d"`                                        // nested struct
 }

@@ -103,11 +103,8 @@ func (p *Parser) parseFileStruct(
 	structInfo := p.parseStruct(objStructType, typeDocMap[objName])
 	res[typeKey] = structInfo
 	for idx, field := range structInfo.Fields {
-		if field.Reference == "" {
-			continue
-		}
 		subModPath := ""
-		if field.Reference == "." {
+		if field.Reference == "" || field.Reference == "." {
 			subModPath = modPath
 		} else {
 			subModPath = namedImportMap[field.Reference]
